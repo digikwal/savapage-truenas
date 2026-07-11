@@ -30,7 +30,7 @@ jobs:
           format: spdx-json
           output-file: sbom.spdx.json
       - name: Scan image
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: savapage-truenas:test
           format: sarif

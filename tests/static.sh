@@ -19,3 +19,4 @@ if grep -R --line-number -E 'image:.*:latest|FROM .*:latest' Dockerfile compose*
     exit 1
 fi
 grep -q 'b5c388a35b707946ca8f4264605b6b252c6620769e2e32dbf910425fd381433c' Dockerfile
+grep -q 'uses: aquasecurity/trivy-action@v[0-9]' .github/workflows/ci.yml
