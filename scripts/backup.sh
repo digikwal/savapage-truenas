@@ -30,15 +30,15 @@ sed -i -E \
 
 test -s "${backup_dir}/postgres.dump"
 test -s "${backup_dir}/files.tar.gz"
-tar -tzf "${backup_dir}/files.tar.gz" | grep -q 'opt/savapage/server/data/encryption.properties' || {
+tar -tzf "${backup_dir}/files.tar.gz" > "${backup_dir}/files.manifest"
+grep -q 'opt/savapage/server/data/encryption.properties' "${backup_dir}/files.manifest" || {
     echo 'Backup is incomplete: encryption.properties is missing' >&2
     exit 1
 }
 
 (
     cd "${backup_dir}"
-    sha256sum postgres.dump files.tar.gz images.json compose.rendered.yaml > SHA256SUMS
+    sha256sum postgres.dump files.tar.gz files.manifest images.json compose.rendered.yaml > SHA256SUMS
 )
 
 printf 'Application-consistent backup created: %s\n' "${backup_dir}"
-
