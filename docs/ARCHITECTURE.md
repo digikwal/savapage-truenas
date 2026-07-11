@@ -7,7 +7,7 @@ The deployment uses two containers:
 ```text
 LAN clients/printers
         |
-        | 8631/8632/8633; optional 9100, 631, mDNS
+        | 8631/8632/8633; optional 9100, 631
         v
 +-----------------------------------+       private bridge       +-------------+
 | savapage                          |---------------------------->| postgres    |
@@ -17,6 +17,11 @@ LAN clients/printers
 |  `- SavaPage (user savapage)      |
 | CUPS notifier installed locally   |
 +-----------------------------------+
+        ^
+        | optional host-network mDNS advertisement only
+   +---------+
+   | Avahi   |
+   +---------+
 ```
 
 SavaPage and CUPS remain in one container. A separate CUPS container was
@@ -114,10 +119,10 @@ installer over the top once, and only advances its marker after success.
 
 ## AirPrint
 
-AirPrint is disabled by default. When enabled, host networking is required in
-the supported configuration so Avahi can announce on the LAN. The advertised
-hostname must resolve to the TrueNAS host, and advertised ports are the actual
-SavaPage listener ports (host-network mode has no port translation). IPv4 and
+AirPrint is disabled by default. When enabled, a small Avahi sidecar uses host
+networking so it can announce on the LAN; SavaPage and PostgreSQL remain on
+bridge networking. The advertised hostname must resolve to the TrueNAS host,
+and advertised ports are the actual published SavaPage host ports. IPv4 and
 IPv6 can be independently disabled, but not both. Bridge-mode mDNS is rejected
 rather than falsely advertised as working.
 

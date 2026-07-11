@@ -1,16 +1,37 @@
 services:
-  savapage:
+  # The application remains on bridge networking so PostgreSQL is never
+  # published. Only this discovery sidecar joins the host network.
+  avahi:
+    image: ${SAVAPAGE_IMAGE:-ghcr.io/digikwal/savapage-truenas:1.6.0}
+    restart: unless-stopped
     network_mode: host
-    networks: !reset []
-    ports: !reset []
-    read_only: false
-    security_opt: !override
-      - no-new-privileges:true
+    entrypoint: ["/usr/local/bin/savapage-avahi-entrypoint"]
+    depends_on:
+      savapage:
+        condition: service_healthy
     environment:
-      ENABLE_AIRPRINT: "true"
-      HOST_NETWORK: "true"
       AIRPRINT_SERVICE_NAME: ${AIRPRINT_SERVICE_NAME:-SavaPage on %h}
       AIRPRINT_HOSTNAME: ${AIRPRINT_HOSTNAME:?Set AIRPRINT_HOSTNAME to the LAN-resolvable TrueNAS hostname}
+      AIRPRINT_ENABLE_HTTP: ${ENABLE_HTTP:-true}
+      AIRPRINT_HTTP_PORT: ${SAVAPAGE_HTTP_HOST_PORT:-8631}
+      AIRPRINT_HTTPS_PORT: ${SAVAPAGE_HTTPS_HOST_PORT:-8632}
       AVAHI_ENABLE_IPV4: ${AVAHI_ENABLE_IPV4:-yes}
       AVAHI_ENABLE_IPV6: ${AVAHI_ENABLE_IPV6:-yes}
-      NO_NEW_PRIVILEGES: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "avahi-browse --all --terminate 2>/dev/null | grep -q '_ipps._tcp'"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    tmpfs:
+      - /run:size=16m,mode=0755
+      - /tmp:size=16m,mode=1777

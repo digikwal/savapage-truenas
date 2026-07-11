@@ -112,11 +112,13 @@ COPY scripts/entrypoint.sh /usr/local/bin/savapage-entrypoint
 COPY scripts/healthcheck-savapage.sh /usr/local/bin/healthcheck-savapage
 COPY scripts/healthcheck-cups.sh /usr/local/bin/healthcheck-cups
 COPY scripts/diagnostics.sh /usr/local/bin/savapage-diagnostics
+COPY scripts/avahi-entrypoint.sh /usr/local/bin/savapage-avahi-entrypoint
 COPY scripts/cups-backend-test-file.sh /usr/lib/cups/backend/savapage-ci-file
 
 RUN install --directory --mode 0755 /usr/share/savapage/default-data /usr/share/savapage/default-cups \
     && cp -a /opt/savapage/server/data/. /usr/share/savapage/default-data/ \
     && cp -a /etc/cups/. /usr/share/savapage/default-cups/ \
+    && cp /etc/avahi/avahi-daemon.conf /usr/share/savapage/avahi-daemon.conf \
     && install --owner root --group root --mode 0700 \
         /opt/savapage/providers/cups/linux-x64/savapage-notifier \
         /usr/lib/cups/notifier/savapage \
@@ -126,6 +128,7 @@ RUN install --directory --mode 0755 /usr/share/savapage/default-data /usr/share/
     && chmod 0755 /usr/local/bin/savapage-entrypoint \
         /usr/local/bin/healthcheck-savapage \
         /usr/local/bin/healthcheck-cups \
+        /usr/local/bin/savapage-avahi-entrypoint \
         /usr/local/bin/savapage-diagnostics \
     && chmod 0755 /usr/lib/cups/backend/savapage-ci-file
 
