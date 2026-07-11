@@ -1,0 +1,36 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+secrets/
+
+# Logs and runtime output
+*.log
+*.log.*
+logs/
+
+# Local Compose customization
+compose.override.yaml
+compose.override.yml
+
+# Backup and restore output
+backups/
+
+# Security scanner, SBOM, and CI artifacts
+.cache/
+trivy-results.sarif
+*.spdx.json
+
+# Test and coverage artifacts
+coverage/
+test-results/
+*.coverage
+
+# Editor and operating-system files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
