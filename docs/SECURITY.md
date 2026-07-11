@@ -28,3 +28,18 @@ not make upstream binaries more trustworthy: provenance rests on the official
 URL plus mandatory SHA-256 because upstream publishes no detached installer
 signature/checksum alongside 1.6.0.
 
+## Vulnerability baseline
+
+The unfiltered HIGH/CRITICAL report is always uploaded to GitHub Security. A
+second scan enforces `.trivyignore.yaml`: existing exceptions are limited to
+the exact JAR paths bundled by the official SavaPage 1.6.0-final installer and
+expire on 2026-10-10. The blocking scan still fails for every OS finding, new
+CVE, new path, or expired exception.
+
+The baseline is risk acceptance, not a claim that the dependencies are safe.
+It covers three CRITICAL and sixteen HIGH path-specific findings detected on
+2026-07-12. Independently replacing application libraries can break SavaPage's
+runtime and migration compatibility, so remediation requires a tested upstream
+SavaPage release. Before renewing any exception, review the newest installer,
+rescan it, document reachability and mitigations, and shorten the renewal to the
+minimum practical period.

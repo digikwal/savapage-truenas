@@ -1,0 +1,88 @@
+# Time-bounded baseline for dependencies bundled by the official SavaPage
+# 1.6.0-final installer. These exceptions are path-scoped so new occurrences,
+# new CVEs, and all OS-package findings continue to fail the blocking scan.
+# Reassess against the newest upstream SavaPage release before 2026-10-10.
+vulnerabilities:
+  - id: CVE-2022-46337
+    paths:
+      - opt/savapage/server/lib/web/derby-10.14.2.0.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; replacing Derby independently is unsupported and the production deployment uses PostgreSQL.
+  - id: CVE-2023-26464
+    paths:
+      - opt/savapage/server/lib/web/log4j-1.2.14.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested dependency update.
+  - id: CVE-2025-10492
+    paths:
+      - opt/savapage/server/lib/web/jasperreports-6.21.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested major JasperReports update.
+  - id: CVE-2025-12383
+    paths:
+      - opt/savapage/server/lib/web/jersey-client-2.45.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested dependency update.
+  - id: CVE-2025-14813
+    paths:
+      - opt/savapage/server/lib/web/bcprov-jdk18on-1.78.1.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; cryptographic libraries will not be replaced without upstream compatibility testing.
+  - id: CVE-2025-48734
+    paths:
+      - opt/savapage/server/lib/web/commons-beanutils-1.9.4.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested dependency update.
+  - id: CVE-2025-48976
+    paths:
+      - opt/savapage/server/lib/web/commons-fileupload-1.5.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested dependency update.
+  - id: CVE-2025-52999
+    paths:
+      - opt/savapage/client/app/lib/jackson-core-2.14.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by the SavaPage 1.6.0 client; requires an upstream-tested dependency update.
+  - id: CVE-2026-2332
+    paths:
+      - opt/savapage/client/app/lib/jetty-http-10.0.26.jar
+      - opt/savapage/server/lib/web/jetty-http-10.0.26.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; the fixed versions require an upstream-tested Jetty upgrade.
+  - id: CVE-2026-27727
+    paths:
+      - opt/savapage/server/lib/web/mchange-commons-java-0.2.15.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested c3p0 dependency update.
+  - id: CVE-2026-27830
+    paths:
+      - opt/savapage/server/lib/web/c3p0-0.9.5.4.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested c3p0 update.
+  - id: CVE-2026-3505
+    paths:
+      - opt/savapage/server/lib/web/bcpg-jdk18on-1.78.1.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; cryptographic libraries will not be replaced without upstream compatibility testing.
+  - id: CVE-2026-42198
+    paths:
+      - opt/savapage/server/lib/web/postgresql-42.7.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; the application JDBC driver requires an upstream-tested update.
+  - id: CVE-2026-54512
+    paths:
+      - opt/savapage/client/app/lib/jackson-databind-2.14.3.jar
+      - opt/savapage/server/lib/web/jackson-databind-2.15.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; the fixed versions require an upstream-tested Jackson upgrade.
+  - id: CVE-2026-54513
+    paths:
+      - opt/savapage/client/app/lib/jackson-databind-2.14.3.jar
+      - opt/savapage/server/lib/web/jackson-databind-2.15.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; the fixed versions require an upstream-tested Jackson upgrade.
+  - id: CVE-2026-6009
+    paths:
+      - opt/savapage/server/lib/web/jasperreports-6.21.3.jar
+    expired_at: 2026-10-10
+    statement: Bundled by SavaPage 1.6.0; requires an upstream-tested major JasperReports update.

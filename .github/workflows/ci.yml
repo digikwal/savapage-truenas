@@ -29,19 +29,31 @@ jobs:
           image: savapage-truenas:test
           format: spdx-json
           output-file: sbom.spdx.json
-      - name: Scan image
+      - name: Scan image for GitHub Security
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: savapage-truenas:test
+          scanners: vuln
           format: sarif
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
           ignore-unfixed: true
-          exit-code: '1'
-      - uses: github/codeql-action/upload-sarif@v4
-        if: always()
+          exit-code: '0'
+      - name: Upload vulnerability report
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results.sarif
+      - name: Enforce vulnerability baseline
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: savapage-truenas:test
+          scanners: vuln
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          trivyignores: .trivyignore.yaml
+          exit-code: '1'
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')

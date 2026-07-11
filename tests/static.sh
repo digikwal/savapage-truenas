@@ -20,3 +20,6 @@ if grep -R --line-number -E 'image:.*:latest|FROM .*:latest' Dockerfile compose*
 fi
 grep -q 'b5c388a35b707946ca8f4264605b6b252c6620769e2e32dbf910425fd381433c' Dockerfile
 grep -q 'uses: aquasecurity/trivy-action@v[0-9]' .github/workflows/ci.yml
+test "$(grep -c '^  - id: CVE-' .trivyignore.yaml)" -eq 16
+test "$(grep -c '^    expired_at: 2026-10-10$' .trivyignore.yaml)" -eq 16
+grep -q 'trivyignores: .trivyignore.yaml' .github/workflows/ci.yml
