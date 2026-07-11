@@ -1,0 +1,16 @@
+services:
+  savapage:
+    network_mode: host
+    networks: !reset []
+    ports: !reset []
+    read_only: false
+    security_opt: !override
+      - no-new-privileges:true
+    environment:
+      ENABLE_AIRPRINT: "true"
+      HOST_NETWORK: "true"
+      AIRPRINT_SERVICE_NAME: ${AIRPRINT_SERVICE_NAME:-SavaPage on %h}
+      AIRPRINT_HOSTNAME: ${AIRPRINT_HOSTNAME:?Set AIRPRINT_HOSTNAME to the LAN-resolvable TrueNAS hostname}
+      AVAHI_ENABLE_IPV4: ${AVAHI_ENABLE_IPV4:-yes}
+      AVAHI_ENABLE_IPV6: ${AVAHI_ENABLE_IPV6:-yes}
+      NO_NEW_PRIVILEGES: "true"

@@ -1,0 +1,8 @@
+services:
+  savapage:
+    read_only: false
+    security_opt: !override
+      - no-new-privileges:false
+    environment:
+      ENABLE_PAM_AUTHENTICATION: "true"
+      NO_NEW_PRIVILEGES: "false"

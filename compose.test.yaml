@@ -1,0 +1,6 @@
+services:
+  savapage:
+    environment:
+      ENABLE_TEST_FILE_PRINTER: "true"
+      CUPS_PRESERVE_JOB_FILES: "Yes"
+

@@ -1,0 +1,151 @@
+name: savapage
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-17.7-bookworm}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-savapage}
+      POSTGRES_USER: ${POSTGRES_USER:-savapage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command:
+      - postgres
+      - -c
+      - max_connections=${POSTGRES_MAX_CONNECTIONS:-30}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /run:size=16m,mode=0755
+    shm_size: 256m
+
+  savapage:
+    image: ${SAVAPAGE_IMAGE:-ghcr.io/digikwal/savapage-truenas:1.6.0}
+    build:
+      context: .
+      args:
+        SAVAPAGE_VERSION: ${SAVAPAGE_VERSION:-1.6.0-final}
+        SAVAPAGE_DOWNLOAD_URL: ${SAVAPAGE_DOWNLOAD_URL:-https://www.savapage.org/download/installer/savapage-setup-1.6.0-final-linux-x64.bin}
+        SAVAPAGE_DOWNLOAD_SHA256: ${SAVAPAGE_DOWNLOAD_SHA256:-b5c388a35b707946ca8f4264605b6b252c6620769e2e32dbf910425fd381433c}
+        JAVA_MAJOR_VERSION: ${JAVA_MAJOR_VERSION:-17}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      LANG: ${LANG:-en_US.UTF-8}
+      SAVAPAGE_DB_HOST: postgres
+      SAVAPAGE_DB_PORT: 5432
+      SAVAPAGE_DB_NAME: ${POSTGRES_DB:-savapage}
+      SAVAPAGE_DB_USER: ${POSTGRES_USER:-savapage}
+      SAVAPAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      SAVAPAGE_DB_POOL_MAX: ${SAVAPAGE_DB_POOL_MAX:-20}
+      # Blank uses SavaPage's default of all interfaces. Set this only when
+      # deliberately restricting the application listener.
+      SAVAPAGE_SERVER_HOST: ${SAVAPAGE_SERVER_HOST:-}
+      ENABLE_HTTP: ${ENABLE_HTTP:-true}
+      SAVAPAGE_HTTP_PORT: 8631
+      SAVAPAGE_HTTPS_PORT: 8632
+      SAVAPAGE_LOCAL_HTTPS_PORT: 8633
+      REDIRECT_HTTP_TO_HTTPS: ${REDIRECT_HTTP_TO_HTTPS:-false}
+      ENABLE_RAW_PRINT: ${ENABLE_RAW_PRINT:-false}
+      SAVAPAGE_RAW_PORT: 9100
+      ENABLE_CUPS_ADMIN: ${ENABLE_CUPS_ADMIN:-false}
+      CUPS_ADMIN_PASSWORD: ${CUPS_ADMIN_PASSWORD:-}
+      CUPS_MAX_JOBS: ${CUPS_MAX_JOBS:-500}
+      CUPS_PRESERVE_JOB_FILES: ${CUPS_PRESERVE_JOB_FILES:-No}
+      TRUSTED_LAN_CIDRS: ${TRUSTED_LAN_CIDRS:-}
+      ENABLE_X_FORWARDED_FOR: ${ENABLE_X_FORWARDED_FOR:-false}
+      ALLOWED_PROXY_CIDRS: ${ALLOWED_PROXY_CIDRS:-}
+      ENABLE_PAM_AUTHENTICATION: ${ENABLE_PAM_AUTHENTICATION:-false}
+      NO_NEW_PRIVILEGES: "true"
+      ENABLE_AIRPRINT: "false"
+      HOST_NETWORK: "false"
+      SAVAPAGE_ADDITIONAL_PROPERTIES: ${SAVAPAGE_ADDITIONAL_PROPERTIES:-}
+    ports:
+      - name: http-ipp
+        target: 8631
+        published: ${SAVAPAGE_HTTP_HOST_PORT:-8631}
+        host_ip: ${SAVAPAGE_BIND_IP:-127.0.0.1}
+        protocol: tcp
+      - name: https-ipps
+        target: 8632
+        published: ${SAVAPAGE_HTTPS_HOST_PORT:-8632}
+        host_ip: ${SAVAPAGE_BIND_IP:-127.0.0.1}
+        protocol: tcp
+      - name: local-https
+        target: 8633
+        published: ${SAVAPAGE_LOCAL_HTTPS_HOST_PORT:-8633}
+        host_ip: ${SAVAPAGE_BIND_IP:-127.0.0.1}
+        protocol: tcp
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck-savapage"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 180s
+    volumes:
+      - savapage-data:/opt/savapage/server/data
+      - savapage-logs:/opt/savapage/server/logs
+      - cups-config:/etc/cups
+      - cups-lib:/var/lib/cups
+      - cups-cache:/var/cache/cups
+      - cups-spool:/var/spool/cups
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+      - /run:size=32m,mode=0755
+      - /opt/savapage/server/tmp:size=512m,mode=0700,uid=1000,gid=1000
+    networks:
+      - frontend
+      - backend
+    # SavaPage lazily writes generated resource templates below its install
+    # tree on first boot, so its upstream layout is not compatible with a
+    # read-only root filesystem.
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+    cpus: ${SAVAPAGE_CPUS:-2.0}
+    mem_limit: ${SAVAPAGE_MEMORY:-4g}
+
+networks:
+  frontend: {}
+  backend:
+    internal: true
+
+volumes:
+  savapage-data: {}
+  savapage-logs: {}
+  cups-config: {}
+  cups-lib: {}
+  cups-cache: {}
+  cups-spool: {}
+  postgres-data: {}

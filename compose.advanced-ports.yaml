@@ -1,0 +1,14 @@
+services:
+  savapage:
+    ports:
+      - name: raw-print
+        target: 9100
+        published: ${SAVAPAGE_RAW_HOST_PORT:-9100}
+        host_ip: ${SAVAPAGE_BIND_IP:-127.0.0.1}
+        protocol: tcp
+      - name: cups-admin
+        target: 631
+        published: ${CUPS_ADMIN_HOST_PORT:-8634}
+        host_ip: ${SAVAPAGE_BIND_IP:-127.0.0.1}
+        protocol: tcp
+
